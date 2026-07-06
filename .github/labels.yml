@@ -1,0 +1,118 @@
+# types
+- name: type-maintenance
+  color: "00AAFF"
+  description: A task that has no noticeable user-facing effect. Code cleanup, small refactors, etc.
+
+- name: type-feature
+  color: "00AAFF"
+  description: A request for a new feature.
+  aliases: [enhancement]
+
+- name: type-improvement
+  color: "00AAFF"
+  description: An improvement or change to an existing feature.
+
+- name: type-optimization
+  color: "00AAFF"
+  description: An optimization to an existing feature.
+
+- name: type-bug
+  color: "00AAFF"
+  description: Something is not working as it should.
+
+# statuses
+- name: status-waiting-for-review
+  color: "00FFAA"
+  description: The PR is ready for review.
+
+- name: status-waiting-for-merge
+  color: "00FFAA"
+  description: The PR has been approved and is waiting for a merge.
+
+- name: status-ready
+  color: "00FFAA"
+  description: This issue is ready to be worked on
+
+- name: status-in-progress
+  color: "00FFAA"
+  description: This issue is being worked on.
+
+- name: status-blocked
+  color: "00FFAA"
+  description: This issue cannot process until a blocker is resolved.
+
+- name: status-missing-information
+  color: "00FFAA"
+  description: This issue needs additional details to proceed.
+
+- name: status-needs-investigation
+  color: "00FFAA"
+  description: This issue is blocked from completion till the bug has been reproduced.
+
+- name: status-needs-testing
+  color: "00FFAA"
+  description: The PR needs to be tested.
+
+- name: status-needs-discussion
+  color: "00FFAA"
+  description: This issue needs to be discussed by its related group.
+
+- name: status-not-planned
+  color: "00FFAA"
+  description: This feature is not planned.
+
+# priorities
+- name: priority-low
+  color: "FFAA00"
+  description: Minor issue or cosmetic issue. Most users would not even notice.
+
+- name: priority-normal
+  color: "FFAA00"
+  description: An issue that is causing a noticeable impact, but can be worked around.
+
+- name: priority-high
+  color: "FFAA00"
+  description: This issue has to be fixed ASAP. For the owning team, nothing else should be worked on.
+
+# difficulties
+- name: difficulty-easy
+  color: "FF00AA"
+  description: Achievable by a single junior developer with a bit of guidance.
+
+- name: difficulty-normal
+  color: "FF00AA"
+  description: Achievable by an reasonable experienced developer.
+
+- name: difficulty-hard
+  color: "FF00AA"
+  description: Achievable, but may require efforts from multiple experienced developers.
+
+# sizes
+- name: size-XS
+  color: "3CBF00"
+
+- name: size-S
+  color: "5D9800"
+
+- name: size-M
+  color: "7F7200"
+
+- name: size-L
+  color: "A14C00"
+
+# etc.
+- name: documentation
+  color: "008080"
+  description: Improvement or additions to documentation.
+
+- name: dependencies
+  color: "808000"
+  description: Pull requests that update a dependency file.
+
+- name: github-actions
+  color: "303030"
+  description: Pull requests that update Github Actions code
+
+- name: tracking
+  color: "D93F00"
+  description: Reminder or collection of issues (typically created by a developer)
