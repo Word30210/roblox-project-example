@@ -7,7 +7,7 @@ reviews:
   high_level_summary: true
   poem: false
   sequence_diagrams: true
-  auto_review
+  auto_review:
     enabled: false
   
 chat:
