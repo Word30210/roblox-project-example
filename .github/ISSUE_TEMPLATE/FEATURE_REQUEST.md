@@ -20,4 +20,4 @@ Describe the solution you would like.
 ## Scope and Impact
 
 - Which area(s) of the project are affected?
-- Any expected impact on simulation behaivor or public APIs?
+- Any expected impact on simulation behavior or public APIs?
