@@ -1,6 +1,7 @@
 {
-    "editor.formatOnPaste": true,
-    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false,
+    "editor.formatOnType": false,
     "[github-actions-workflow]": {
         "editor.insertSpaces": true,
         "editor.tabSize": 2,
@@ -9,6 +10,13 @@
         "editor.defaultColorDecorators": "never",
         "editor.quickSuggestions": {
             "strings": "on"
-        }
+        },
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true
+    },
+    "[luau]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua",
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true
     }
 }
