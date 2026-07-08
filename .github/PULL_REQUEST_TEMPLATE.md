@@ -17,7 +17,7 @@
 
 - [ ] Runtime Configuration changes are documented (if applicable)
 - [ ] User/developer documents were updated (`README.md` or relevant documents, if applicable)
-- [ ] No senstive values or credentials were introduced
+- [ ] No sensitive values or credentials were introduced
 
 ### If Applicable
 
