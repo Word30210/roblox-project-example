@@ -1,0 +1,11 @@
+{
+    "git.openRepositoryInParentFolders": "always",
+    "luau-lsp.platform.type": "roblox",
+    "luau-lsp.fflags.enableNewSolver": true,
+    "[lua]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua"
+    },
+    "[luau]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua"
+    }
+}
