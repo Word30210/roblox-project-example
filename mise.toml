@@ -1,0 +1,10 @@
+[tools]
+"aqua:JohnnyMorganz/StyLua" = "latest"
+"aqua:Kampfkarren/selene" = "latest"
+"github:jackTabsCode/asphalt" = "latest"
+"github:luau-lang/lute" = "latest"
+"github:pesde-pkg/pesde" = "latest"
+"github:rojo-rbx/rojo" = "latest"
+"github:seaofvoices/darklua" = "latest"
+just = "latest"
+mprocs = "latest"
