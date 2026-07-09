@@ -1,0 +1,17 @@
+{
+    "name": "main",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "roblox_packages": { "$path": { "optional": "roblox_packages" } }
+        },
+        "ServerScriptService": { "$path": { "optional": "dist/server" } },
+        "ServerStorage": {
+            "storage": { "$path": { "optional": "dist/storage" } }
+        },
+        "StarterPlayer": {
+            "StarterPlayerScripts": { "$path": { "optional": "dist/client" } }
+        },
+        "Workspace": { "$path": { "optional": "dist/workspace" } }
+    }
+}

@@ -1,0 +1,6 @@
+name = "word30210_rpe/assets"
+version = "0.0.1"
+
+[target]
+environment = "roblox"
+lib = "dist/init.luau"

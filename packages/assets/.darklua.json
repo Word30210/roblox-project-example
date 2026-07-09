@@ -1,0 +1,13 @@
+{
+    "generator": "retain_lines",
+    "rules": [
+        {
+            "rule": "convert_require",
+            "current": "path",
+            "target": {
+                "name": "roblox",
+                "indexing_style": "wait_for_child"
+            }
+        }
+    ]
+}
