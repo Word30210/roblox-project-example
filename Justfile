@@ -1,4 +1,4 @@
-set windows-shell := ["powershell.exe", "-NoProfile", "-NoLogo", "-c"]
+set windows-shell := ["pwsh", "-NoProfile", "-NoLogo", "-c"]
 set dotenv-load := true
 
 mprocs-args := '--names "rojo-sourcemap,darklua-process,rojo-serve" ' + \
