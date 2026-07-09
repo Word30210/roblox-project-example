@@ -1,0 +1,15 @@
+# rojo
+**/sourcemap.json
+
+# darklua
+**/dist/
+
+# pesde
+**/.pesde
+**/*_packages
+
+# asphalt
+/.asphalt-debug/
+
+# env
+/.env
