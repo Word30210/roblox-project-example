@@ -1,7 +1,7 @@
 name = "word30210_rpe/root"
 version = "0.0.1"
 
-workspace_members = ["packages/*", "places/*"]
+workspace_members = ["packages/*", "places/*", "scripts"]
 
 [target]
 environment = "roblox"
