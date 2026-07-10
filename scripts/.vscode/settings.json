@@ -1,0 +1,18 @@
+{
+    "git.openRepositoryInParentFolders": "always",
+    "luau-lsp.platform.type": "standard",
+    "luau-lsp.fflags.enableNewSolver": true,
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false,
+    "editor.formatOnType": false,
+    "[lua]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua",
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true
+    },
+    "[luau]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua",
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true
+    }
+}
