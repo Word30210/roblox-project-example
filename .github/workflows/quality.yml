@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Format & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Debug mise
+        run: |
+          mise ls
+          mise which stylua || echo "stylua not on path"
+          mise which selene || echo "selene not on path"
+          mise which lute || echo "lute not on path"
+      
+      - name: Check formatting & Lint
+        run: lute run scripts/src/quality.luau -v --print-results
