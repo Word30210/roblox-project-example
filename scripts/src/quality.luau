@@ -1,6 +1,5 @@
 const io = require("@std/io")
 const fs = require("@std/fs")
-const task = require("@std/task")
 const path = require("@std/path")
 const process = require("@std/process")
 const stringext = require("@std/stringext")
@@ -9,11 +8,13 @@ const tint = require("@pkg/tint")
 
 const noStylua = table.find(process.args, "--no-check") or table.find(process.args, "--no-stylua")
 const noSelene = table.find(process.args, "--no-lint") or table.find(process.args, "--no-selene")
+const buildVerification = table.find(process.args, "--build-verification") or table.find(process.args, "--do-rojo")
+const noBuildOutput = table.find(process.args, "--no-build-output") or table.find(process.args, "--no-rojo-output")
 const resolveFormat = table.find(process.args, "--resolve-format") or table.find(process.args, "--resolve-stylua")
 const printResults = table.find(process.args, "--print-results")
 const verboseMode = table.find(process.args, "-v") or table.find(process.args, "--verbose")
 
-type ToolType = "StyLua" | "selene"
+type ToolType = "StyLua" | "selene" | "Rojo"
 
 local qualityFailed = false
 local failedStack = ""
@@ -28,23 +29,48 @@ const function toRelative(target: path.Pathlike): string
 end
 
 const function pushFailed(file: path.Path, type: ToolType, content: string)
-    const header = tint.gray(`[{type}]`, "\n", `{toRelative(file)}`, tint.reset("\n"))
+    const header = tint.gray(`[{type}]`, `{"\n" .. toRelative(file)}`, tint.reset("\n"))
     if not qualityFailed then
         qualityFailed = true
         failedStack ..= header .. content
     else
-        failedStack ..= header .. "\n\n" .. content
+        failedStack ..= "\n\n" .. header .. content
     end
 
     toolFails[type] = toolFails[type] or 0
     toolFails[type] += 1
 end
 
-const function getSrcLuaus(): { path.Path }
-    const results: { path.Path } = {}
+const function isGit(full: path.Path): boolean
+    const subject = path.format(full):gsub("\\", "/")
+    const matched = subject:match("/.git") ~= nil
 
+    return matched
+end
+
+const function getPaths(acceptFn: (path.Path) -> boolean): { path.Path }
+    const results: { path.Path } = {}
+    const stack: { path.Path } = { CWD }
+    while #stack > 0 do
+        const current = table.remove(stack) :: path.Path
+        for _, entry in fs.listDirectory(current) do
+            const full = path.join(current, entry.name)
+            if acceptFn(full) then
+                table.insert(results, full)
+            end
+
+            if entry.type == "dir" and not isGit(full) then
+                table.insert(stack, full)
+            end
+        end
+    end
+
+    return results
+end
+
+const function getSrcLuaus(): { path.Path }
     const function accept(full: path.Path): boolean
-        const subject = (path.format(full):gsub("\\", "/"))
+        const subject = path.format(full):gsub("\\", "/")
         const matched = subject:match("/src/[^/]+%.luau?$") ~= nil
 
         if matched and toRelative(full) == "packages/assets/src/assets.luau" then
@@ -54,25 +80,10 @@ const function getSrcLuaus(): { path.Path }
         return matched
     end
 
-    const stack: { path.Path } = { CWD }
-    while #stack > 0 do
-        const current = table.remove(stack) :: path.Path
-        for _, entry in fs.listDirectory(current) do
-            const full = path.join(current, entry.name)
-            if accept(full) then
-                table.insert(results, full)
-            end
-
-            if entry.type == "dir" then
-                table.insert(stack, full)
-            end
-        end
-    end
-
-    return results
+    return getPaths(accept)
 end
 
-local function getToml(from: path.Path, tomlName: string): path.Path?
+local function getNearestToml(from: path.Path, tomlName: string): path.Path?
     local current = path.format(from)
     local srcDir: string? = nil
 
@@ -103,13 +114,28 @@ local function getToml(from: path.Path, tomlName: string): path.Path?
     return if fs.exists(tomlPath) then tomlPath else nil
 end
 
-const function runTool(args: { string }): (number, string?)
-    const res = process.run(args)
+const function getBuildProjectJson()
+    const function accept(full: path.Path): boolean
+        const subject = path.format(full):gsub("\\", "/")
+        const matched = subject:match("build.project.json$") ~= nil
+
+        return matched
+    end
+
+    return getPaths(accept)
+end
+
+const function runTool(args: { string }, options: process.ProcessRunOptions?): (number, string?)
+    const res = process.run(args, options)
 
     if res.exitcode == 2 then
         return 2, stringext.trim(res.stderr)
     elseif res.exitcode == 1 then
-        return 1, stringext.trim(res.stdout)
+        if args[1] == "rojo" then
+            return 1, stringext.trim(res.stderr)
+        else
+            return 1, stringext.trim(res.stdout)
+        end
     else
         return 0, nil
     end
@@ -117,10 +143,6 @@ end
 
 const function verbose<T>(value: T): T?
     return if verboseMode then value else nil
-end
-
-const function found(n: number)
-    print(tint.green("FOUND", tint.reset(`found {n} luau files`)))
 end
 
 const function succeed(file: path.Path, toml: path.Path?)
@@ -150,7 +172,7 @@ const function failed(file: path.Path, type: ToolType, content: string, toml: pa
 end
 
 const function err(file: path.Path, type: ToolType, message: string, toml: path.Path?)
-    io.write(tint.red("FAILED", tint.reset(`{toRelative(file)}: {message}`)))
+    io.write(tint.red("ERROR", tint.reset(`{toRelative(file)}: {message}`)))
     if toml then
         io.write(tint.reset.dim(` ({toRelative(toml)})`))
     end
@@ -162,7 +184,7 @@ end
 const function checkStylua(luauFiles: { path.Path })
     const ty = "StyLua"
     for _, luauFile in luauFiles do
-        const toml = getToml(luauFile, "stylua")
+        const toml = getNearestToml(luauFile, "stylua")
         if toml then
             const exitcode, res =
                 runTool({ "stylua", toRelative(luauFile), "--check", "--config-path", toRelative(toml) })
@@ -192,10 +214,10 @@ const function checkStylua(luauFiles: { path.Path })
     end
 end
 
-const function checkSelene (luauFiles: { path.Path })
+const function checkSelene(luauFiles: { path.Path })
     const ty = "selene"
     for _, luauFile in luauFiles do
-        const toml = getToml(luauFile, "selene")
+        const toml = getNearestToml(luauFile, "selene")
         if toml then
             const exitcode, res = runTool({ "selene", toRelative(luauFile), "--config", toRelative(toml) })
             if exitcode == 0 then
@@ -211,14 +233,44 @@ const function checkSelene (luauFiles: { path.Path })
     end
 end
 
+const function buildWithRojo(projects: { path.Path })
+    const ty = "Rojo"
+    for _, project in projects do
+        const parent = path.dirname(project)
+        const exitcode, res = runTool({ "rojo", "build", "build.project.json", "-o", "output.rbxl" }, { cwd = parent })
+        if exitcode == 0 then
+            if noBuildOutput then
+                const buildOutput = path.join(parent, "output.rbxl")
+                fs.remove(buildOutput)
+            end
+
+            succeed(project)
+        elseif exitcode == 1 then
+            failed(project, ty, res :: string)
+        elseif exitcode == 2 then
+            err(project, ty, res :: string)
+        end
+    end
+end
+
 const luauFiles = getSrcLuaus()
 const numberOfLuauFiles = #luauFiles
-found(numberOfLuauFiles)
+print(tint.green("FOUND", tint.reset(`found {numberOfLuauFiles} luau files`)))
+
+const projectsToBuild = getBuildProjectJson()
+const numberOfProjectsToBuild = #projectsToBuild
+print(tint.green("FOUND", tint.reset(`found {numberOfProjectsToBuild} projects to build`)))
+print()
+
 if not noStylua then
     checkStylua(luauFiles)
 end
 if not noSelene then
     checkSelene(luauFiles)
+end
+if buildVerification then
+    print()
+    buildWithRojo(projectsToBuild)
 end
 
 if qualityFailed and printResults then
@@ -232,15 +284,10 @@ if printResults and next(resolvedFiles) then
     end
 end
 
-print(tint.blue.bold("\nSUCCEED CHECKS:"))
-for toolType, fails in toolFails do
-    io.write(tint.reset(`- [{toolType}]: `))
-    if fails == 0 then
-        print(tint.green(`{numberOfLuauFiles - fails}/{numberOfLuauFiles}`))
-    elseif fails >= numberOfLuauFiles then
-        print(tint.red(`{numberOfLuauFiles - fails}/{numberOfLuauFiles}`))
-    else
-        print(tint.yellow(`{numberOfLuauFiles - fails}/{numberOfLuauFiles}`))
+if next(toolFails) then
+    print(tint.yellow.bold("\nFAILED WORKS:"))
+    for toolType, fails in toolFails do
+        print(tint.reset(`- [{toolType}]:`, tint.red(`{fails}`)))
     end
 end
 
