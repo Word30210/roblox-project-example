@@ -62,6 +62,10 @@ module.options = table.freeze({
         { "no build output", "no rojo output" },
         "Suppress Rojo's build output; the build still runs, just quietly."
     ),
+    syncAssets = register(
+        { "sync assets" },
+        "Sync assets to Roblox Cloud. If this option is false, it'll dry-run instead"
+    ),
     printResults = register(
         { "verbose", "print results" },
         "Print detailed results for each step instead of a summary."

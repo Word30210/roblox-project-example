@@ -144,6 +144,7 @@ const function buildWithRojo()
                 report.detail = (res :: any) :: string
 
                 stepOptions.skip = true
+                collector:record(report, stepOptions.header)
                 return stepOptions
             elseif res.exitcode >= 1 then
                 report.status = "err"
@@ -157,6 +158,7 @@ const function buildWithRojo()
             report.detail = "skipped due before step wasn't successfully completed."
 
             stepOptions.skip = true
+            collector:record(report, stepOptions.header)
             return stepOptions
         end
 
@@ -171,19 +173,52 @@ const function buildWithRojo()
     const packageHeader = Collector.header("[PREPARE PACKAGES]")
     collector:record(packageHeader, header)
 
+    -- asphalt
+    local asphaltFailed = false
+    do
+        const packageAsphaltHeader = Collector.header("[PROCESS WITH ASPHALT]")
+        collector:record(packageAsphaltHeader, packageHeader)
+
+        const report = Collector.content("unknown", "asphalt", utils.CWD)
+
+        const ok, res = pcall(
+            process.run,
+            if optionHashmap.syncAssets
+                then { "asphalt", "sync", "cloud" }
+                else { "asphalt", "sync", "cloud", "--dry-run" },
+            nil
+        )
+
+        if not ok then
+            report.status = "err"
+            report.detail = (res :: any) :: string
+            asphaltFailed = true
+        elseif res.exitcode >= 1 then
+            report.status = "err"
+            report.detail = res.stderr
+            asphaltFailed = true
+        else
+            report.status = "pass"
+            report.detail = res.stdout
+        end
+
+        collector:record(report, packageAsphaltHeader)
+    end
+
     const packagePesdeHeader = Collector.header("[INSTALL DEPENDENCIES]")
     collector:record(packagePesdeHeader, packageHeader)
 
     const packageDarkluaHeader = Collector.header("[PROCESS WITH DARKLUA]")
     collector:record(packageDarkluaHeader, packageHeader)
 
+    local packageFailed = false
     for _, package in fs.listDirectory("packages") do
         const full = path.join("packages", package.name)
         local stepOptions: StepOptions = {
             header = packagePesdeHeader,
             tool = "pesde",
             location = full,
-            skip = false,
+            skip = asphaltFailed,
             runArgs = { "pesde", "install", "--locked" },
             runOptions = { cwd = utils.toRelative(full) },
         }
@@ -196,6 +231,10 @@ const function buildWithRojo()
         stepOptions.tool = "darklua"
         stepOptions.runArgs = { "darklua", "process", "src", "dist" }
         stepOptions = runStep(stepOptions)
+
+        if stepOptions.skip then
+            packageFailed = true
+        end
     end
 
     -- places
@@ -220,7 +259,7 @@ const function buildWithRojo()
             header = placePesdeHeader,
             tool = "pesde",
             location = full,
-            skip = false,
+            skip = asphaltFailed or packageFailed,
             runArgs = { "pesde", "install", "--locked" },
             runOptions = { cwd = utils.toRelative(full) },
         }
@@ -270,7 +309,7 @@ end
 
 print(collector:renderReports())
 
-if collector:hasFailure() then
+if collector:hasFailure() or collector:hasSkipped() then
     print(tint.red.bold("QUALITY IS BAD"))
     process.exit(1)
 else

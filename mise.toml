@@ -8,3 +8,6 @@
 "github:seaofvoices/darklua" = "0.19.0"
 just = "1.55.1"
 mprocs = "0.9.6"
+
+[env]
+_.file = ".env"

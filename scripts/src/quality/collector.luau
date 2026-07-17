@@ -8,7 +8,7 @@ const options = require("./options")
 
 export type ReportType = "header" | "content"
 export type Status = "pass" | "resolve" | "fail" | "err" | "skip" | "unknown"
-export type ToolType = "stylua" | "selene" | "rojo" | "pesde" | "darklua" | "unknown"
+export type ToolType = "stylua" | "selene" | "asphalt" | "rojo" | "pesde" | "darklua" | "unknown"
 
 type ReportStyle = { ansi: tint.style }
 type StatusStyle = { label: string, ansi: tint.style }
