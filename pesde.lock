@@ -10,3 +10,6 @@ roblox = "packages/assets"
 
 [workspace."word30210_rpe/main"]
 roblox = "places/main"
+
+[workspace."word30210_rpe/scripts"]
+luau = "scripts"

@@ -1,0 +1,6 @@
+[files]
+extend-exclude = ["assets/", "packages/assets/**/assets.luau"]
+
+[type.selene]
+extend-glob = ["selene.toml"]
+extend-ignore-re = ["parenthese_conditions"]

@@ -1,2 +1,3 @@
 **/dist/
+**/*_packages/
 packages/assets/src/assets.luau

@@ -1,5 +1,7 @@
 # rojo
 **/sourcemap.json
+**/*.rbxl
+**/*.rbxlx
 
 # darklua
 **/dist/

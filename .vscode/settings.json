@@ -2,6 +2,7 @@
     "editor.formatOnPaste": false,
     "editor.formatOnSave": false,
     "editor.formatOnType": false,
+    "luau-lsp.fflags.enableNewSolver": true,
     "[github-actions-workflow]": {
         "editor.insertSpaces": true,
         "editor.tabSize": 2,

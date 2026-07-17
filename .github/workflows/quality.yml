@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Format & Lint & Build Verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Debug mise
+        run: |
+          mise ls
+          mise which lute || echo "lute not on path"
+          mise which stylua || echo "stylua not on path"
+          mise which selene || echo "selene not on path"
+          mise which pesde || echo "pesde not on path"
+          mise which darklua || echo "darklua not on path"
+          mise which rojo || echo "rojo not on path"
+      
+      - name: Install dependencies for scripts (quality checker)
+        run: |
+          (
+            cd scripts
+            pesde install --locked
+          )
+      
+      - name: Check formatting & Lint & Build Verification
+        run: lute run scripts/src/quality --verbose --build
