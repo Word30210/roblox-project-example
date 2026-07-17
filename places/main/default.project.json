@@ -12,6 +12,9 @@
         "StarterPlayer": {
             "StarterPlayerScripts": { "$path": { "optional": "src/client" } }
         },
-        "Workspace": { "$path": { "optional": "src/workspace" } }
+        "Workspace": { "$path": { "optional": "src/workspace" } },
+        "Players": {
+            "$properties": { "CharacterAutoLoads": false }
+        }
     }
 }
