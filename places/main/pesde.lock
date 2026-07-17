@@ -5,6 +5,13 @@ name = "word30210_rpe/main"
 version = "0.0.1"
 target = "roblox"
 
+[graph."centau/vide@0.4.0 roblox"]
+direct = ["vide", { name = "centau/vide", version = "^0.4.0", index = "default" }, "standard"]
+
+[graph."centau/vide@0.4.0 roblox".pkg_ref]
+ref_ty = "pesde"
+index_url = "https://github.com/pesde-pkg/index"
+
 [graph."word30210_rpe/assets@0.0.1 roblox"]
 direct = ["assets", { workspace = "word30210_rpe/assets", version = "^" }, "standard"]
 
