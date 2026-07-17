@@ -1,0 +1,2 @@
+[files]
+extend-exclude = ["assets/", "packages/assets/**/assets.luau"]
