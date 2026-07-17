@@ -43,9 +43,9 @@ function utils.findUp(from: path.Path, match: string): path.Path?
     current = path.relative(utils.CWD, current)
 
     while true do
-        const cadidate = path.join(current, match)
-        if fs.exists(cadidate) then
-            return path.relative(utils.CWD, cadidate)
+        const candidate = path.join(current, match)
+        if fs.exists(candidate) then
+            return path.relative(utils.CWD, candidate)
         end
 
         const parent = path.resolve(current, "..")

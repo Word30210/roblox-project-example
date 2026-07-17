@@ -202,7 +202,7 @@ const function buildWithRojo()
     const placeHeader = Collector.header("[PREPARE PACKAGES]")
     collector:record(placeHeader, header)
 
-    const placePesdeHeader = Collector.header("[INSTALL DEPDENDENCIES]")
+    const placePesdeHeader = Collector.header("[INSTALL DEPENDENCIES]")
     collector:record(placePesdeHeader, placeHeader)
 
     const placeSourcemapHeader = Collector.header("[GENERATE SOURCEMAP WITH ROJO]")
