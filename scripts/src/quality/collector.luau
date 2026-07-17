@@ -1,62 +1,68 @@
 const path = require("@std/path")
 
 const tint = require("@pkg/tint")
+const ANSI_RESET = tint.reset("")
+
 const utils = require("./utils")
 const options = require("./options")
 
-export type Status = "pass" | "resolved" | "fail" | "err" | "skipped"
-export type ToolType = "stylua" | "selene" | "rojo" | "pesde" | "darklua"
+export type ReportType = "header" | "content"
+export type Status = "pass" | "resolve" | "fail" | "err" | "skip" | "unknown"
+export type ToolType = "stylua" | "selene" | "rojo" | "pesde" | "darklua" | "unknown"
 
-export type HeaderReport = {
-    kind: "header",
-    detail: string,
-}
-export type ContentReport = {
-    kind: "content",
-    header: HeaderReport?,
-    status: Status,
-    tool: ToolType,
-    target: path.Path,
-    config: path.Path?,
-    detail: string?,
-}
-export type Report = HeaderReport | ContentReport
+type ReportStyle = { ansi: tint.style }
+type StatusStyle = { label: string, ansi: tint.style }
 
-const REPORT_STYLE = {
+const REPORT_STYLE: { header: ReportStyle, content: ReportStyle } = {
     header = { ansi = tint.gray },
     content = { ansi = tint.reset },
 }
 
-const STATUS_STYLE = {
+const STATUS_STYLE: { [Status]: StatusStyle } = {
     pass = { label = "SUCCEED", ansi = tint.bright_green },
-    resolved = { label = "RESOLVED", ansi = tint.green },
+    resolve = { label = "RESOLVED", ansi = tint.green },
     fail = { label = "FAILED", ansi = tint.red },
     err = { label = "ERROR", ansi = tint.bright_red },
-    skipped = { label = "SKIPPED", ansi = tint.blue },
+    skip = { label = "SKIPPED", ansi = tint.blue },
+    unknown = { label = "UNKNOWN", ansi = tint.bg_white.black },
 }
+
+export type HeaderReport = {
+    type: "header",
+    detail: string,
+    children: { Report },
+}
+export type ContentReport = {
+    type: "content",
+    status: Status,
+    tool: ToolType,
+    file: path.Path,
+    subFile: path.Path?,
+    detail: string?,
+}
+export type Report = HeaderReport | ContentReport
 
 const function header(detail: string): HeaderReport
     return {
-        kind = "header",
+        type = "header",
         detail = detail,
+        children = {},
     }
 end
 
 const function content(
     status: Status,
     tool: ToolType,
-    target: path.Path,
-    config: path.Path?,
-    detail: string?,
-    header: HeaderReport?
+    file: path.Path,
+    subFile: path.Path?,
+    detail: string?
 ): ContentReport
     return {
-        kind = "content",
-        header = header,
+        type = "content",
         status = status,
         tool = tool,
-        target = target,
-        config = config,
+        file = file,
+        subFile = subFile,
         detail = detail,
     }
 end
@@ -80,51 +86,79 @@ const function new(): Collector
     }, CollectorPrototype)
 end
 
-const function printReport(report: Report)
-    if report.kind == "header" then
-        print(REPORT_STYLE.header.ansi(report.detail))
-    elseif report.kind == "content" then
-        const header = report.header
-        if header then
-            const headerAnsi = REPORT_STYLE.header.ansi
-            const contentAnsi = REPORT_STYLE.content.ansi
-            const statusLabel: string = STATUS_STYLE[report.status].label
-            const statusAnsi: tint.style = STATUS_STYLE[report.status].ansi
-            print(
-                headerAnsi(
-                    "└",
-                    statusAnsi(statusLabel),
-                    tint.gray(utils.toRelative(report.target)),
-                    if report.config then tint.gray(`({utils.toRelative(report.config)})`) else "",
-                    if options.options.printResults and report.detail then contentAnsi(report.detail) else ""
-                )
-            )
-        else
-            const contentAnsi = REPORT_STYLE.content.ansi
-            const statusLabel: string = STATUS_STYLE[report.status].label
-            const statusAnsi: tint.style = STATUS_STYLE[report.status].ansi
-            print(
-                statusAnsi(
-                    statusLabel,
-                    tint.gray(utils.toRelative(report.target)),
-                    if report.config then tint.gray(`({utils.toRelative(report.config)})`) else "",
-                    if options.options.printResults and report.detail then contentAnsi(report.detail) else ""
-                )
-            )
+function Collector.record(self: Collector, report: Report, parent: HeaderReport?)
+    if parent then
+        table.insert(parent.children, report)
+    else
+        table.insert(self.reports, report)
+    end
+
+    if report.type == "content" then
+        if report.status == "fail" or report.status == "err" or report.status == "unknown" then
+            table.insert(self.failedReports, report)
+        elseif report.status == "skip" then
+            table.insert(self.skippedReports, report)
         end
     end
 end
 
-function Collector.record(self: Collector, report: Report)
-    table.insert(self.reports, report)
-    if report.kind == "content" then
-        if report.status == "fail" or report.status == "err" then
-            table.insert(self.failedReports, report)
-        elseif report.status == "skipped" then
-            table.insert(self.skippedReports, report)
+function Collector.renderReports(self: Collector): string
+    local res = ""
+
+    for index, report in self.reports do
+        res ..= self:render(report) .. "\n"
+        if index < #self.reports then
+            res ..= "\n"
         end
     end
-    printReport(report)
+
+    return res
+end
+
+function Collector.render(self: Collector, report: Report, padding: number?): string
+    if report.type == "header" then
+        return self:renderHeader(report, padding)
+    elseif report.type == "content" then
+        return self:renderContent(report, padding)
+    else
+        return ""
+    end
+end
+
+const function getPadding(padding: number): string
+    local res = (" "):rep(padding - 1)
+    if padding > 0 then
+        res ..= ANSI_RESET .. REPORT_STYLE.header.ansi("└ ") .. ANSI_RESET
+    end
+
+    return res
+end
+
+function Collector.renderHeader(self: Collector, report: HeaderReport, padding: number?): string
+    local res = getPadding(padding or 0)
+    res ..= ANSI_RESET .. REPORT_STYLE.header.ansi(report.detail) .. ANSI_RESET
+
+    for _, child in report.children do
+        res ..= "\n" .. self:render(child, (padding or 0) + 1 + if padding == nil then 0 else 1)
+    end
+
+    return res
+end
+
+function Collector.renderContent(_: Collector, report: ContentReport, padding: number?): string
+    local res = getPadding(padding or 0)
+    res ..= ANSI_RESET .. STATUS_STYLE[report.status].ansi(STATUS_STYLE[report.status].label) .. ANSI_RESET
+    res ..= " " .. ANSI_RESET .. tint.gray(utils.toRelative(report.file)) .. ANSI_RESET
+
+    if report.subFile then
+        res ..= " " .. ANSI_RESET .. tint.gray(`({utils.toRelative(report.subFile)})`) .. ANSI_RESET
+    end
+
+    if options.options.printResults and report.detail then
+        res ..= " " .. ANSI_RESET .. REPORT_STYLE.content.ansi(report.detail) .. ANSI_RESET
+    end
+
+    return res
 end
 
 function Collector.hasFailure(self: Collector): boolean
