@@ -88,17 +88,29 @@
   description: Achievable, but may require efforts from multiple experienced developers.
 
 # sizes
-- name: size-XS
+- name: size/XS
   color: "3CBF00"
+  aliases: [size-XS]
 
-- name: size-S
+- name: size/S
   color: "5D9800"
+  aliases: [size-S]
 
-- name: size-M
+- name: size/M
   color: "7F7200"
+  aliases: [size-M]
 
-- name: size-L
+- name: size/L
   color: "A14C00"
+  aliases: [size-L]
+
+- name: size/XL
+  color: "C32500"
+  aliases: [size-XL]
+
+- name: size/XXL
+  color: "E50000"
+  aliases: [size-XXL]
 
 # etc.
 - name: documentation
