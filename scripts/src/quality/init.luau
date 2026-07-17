@@ -47,7 +47,6 @@ const function checkStylua()
             if res.exitcode >= 2 then
                 report.status = "err"
                 report.detail = res.stderr
-                collector:record(report, header)
             elseif res.exitcode == 1 then
                 if optionHashmap.resolveFormat then
                     const resolveRes = process.run({
