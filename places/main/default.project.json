@@ -3,7 +3,8 @@
     "tree": {
         "$className": "DataModel",
         "ReplicatedStorage": {
-            "roblox_packages": { "$path": { "optional": "roblox_packages" } }
+            "roblox_packages": { "$path": { "optional": "roblox_packages" } },
+            "remotes": { "$path": "rojo-assets/shared/remotes" }
         },
         "ServerScriptService": { "$path": { "optional": "src/server" } },
         "ServerStorage": {
