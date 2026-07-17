@@ -29,5 +29,12 @@ jobs:
           mise which darklua || echo "darklua not on path"
           mise which rojo || echo "rojo not on path"
       
+      - name: Install dependencies for scripts (quality checker)
+        run: /
+          (
+            cd scripts
+            pesde install --locked
+          )
+      
       - name: Check formatting & Lint & Build Verification
         run: lute run scripts/src/quality --verbose --build
