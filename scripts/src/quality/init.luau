@@ -71,7 +71,7 @@ const function checkStylua()
                 end
             else
                 report.status = "pass"
-                report.detail = "no formattig issues are found."
+                report.detail = "no formatting issues are found."
             end
         else
             report.status = "err"
@@ -235,7 +235,7 @@ const function buildWithRojo()
     end
 
     -- places
-    const placeHeader = Collector.header("[PREPARE PACKAGES]")
+    const placeHeader = Collector.header("[PREPARE PLACES]")
     collector:record(placeHeader, header)
 
     const placePesdeHeader = Collector.header("[INSTALL DEPENDENCIES]")
