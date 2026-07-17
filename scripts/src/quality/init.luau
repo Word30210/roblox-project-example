@@ -40,13 +40,14 @@ const function checkStylua()
             if not ok then
                 report.status = "err"
                 report.detail = (res :: any) :: string
+                collector:record(report, header)
                 continue
             end
 
             if res.exitcode >= 2 then
                 report.status = "err"
                 report.detail = res.stderr
-                collector:record(report)
+                collector:record(report, header)
             elseif res.exitcode == 1 then
                 if optionHashmap.resolveFormat then
                     const resolveRes = process.run({
@@ -144,11 +145,10 @@ const function buildWithRojo()
                 report.detail = (res :: any) :: string
 
                 stepOptions.skip = true
-                collector:record(report, stepOptions.header)
-                return stepOptions
             elseif res.exitcode >= 1 then
                 report.status = "err"
                 report.detail = res.stderr
+                stepOptions.skip = true
             else
                 report.status = "pass"
                 report.detail = "successfully completed."
@@ -158,8 +158,6 @@ const function buildWithRojo()
             report.detail = "skipped due before step wasn't successfully completed."
 
             stepOptions.skip = true
-            collector:record(report, stepOptions.header)
-            return stepOptions
         end
 
         collector:record(report, stepOptions.header)
