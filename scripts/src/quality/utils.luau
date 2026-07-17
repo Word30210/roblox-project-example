@@ -12,7 +12,7 @@ end
 
 function utils.isGit(full: path.Path): boolean
     const subject = path.format(full):gsub("\\", "/")
-    return subject:match(".git") ~= nil
+    return subject:match("/%.git/") ~= nil or subject:match("/%.git$") ~= nil
 end
 
 function utils.getPaths(filter: (path.Path) -> boolean): { path.Path }
@@ -22,11 +22,12 @@ function utils.getPaths(filter: (path.Path) -> boolean): { path.Path }
         const current = table.remove(stack, 1) :: path.Path
         for _, entry in fs.listDirectory(current) do
             const full = path.join(current, entry.name)
-            if not utils.isGit(full) and filter(full) then
+            const ignored = utils.isGit(full)
+            if not ignored and filter(full) then
                 table.insert(results, full)
             end
 
-            if entry.type == "dir" then
+            if entry.type == "dir" and not ignored then
                 table.insert(stack, 1, full)
             end
         end
