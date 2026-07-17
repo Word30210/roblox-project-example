@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Format & Lint
+    name: Format & Lint & Build Verification
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -22,9 +22,12 @@ jobs:
       - name: Debug mise
         run: |
           mise ls
+          mise which lute || echo "lute not on path"
           mise which stylua || echo "stylua not on path"
           mise which selene || echo "selene not on path"
-          mise which lute || echo "lute not on path"
+          mise which pesde || echo "pesde not on path"
+          mise which darklua || echo "darklua not on path"
+          mise which rojo || echo "rojo not on path"
       
-      - name: Check formatting & Lint
-        run: lute run scripts/src/quality.luau -v --print-results
+      - name: Check formatting & Lint & Build Verification
+        run: lute run scripts/src/quality --verbose --build
