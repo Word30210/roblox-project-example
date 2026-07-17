@@ -110,7 +110,7 @@
 
 - name: size/XXL
   color: "E50000"
-  aliases: [size-XLL]
+  aliases: [size-XXL]
 
 # etc.
 - name: documentation
