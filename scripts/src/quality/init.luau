@@ -13,7 +13,7 @@ const collector = Collector.new()
 
 const luauFiles = utils.getPaths(function(full)
     const subject = path.format(full):gsub("\\", "/")
-    const luauMatched = subject:match("/src/.+%.luau?$") ~= nil
+    const luauMatched = subject:match("/src/.+%.luau?$") ~= nil and subject:match("_packages") == nil
     const asphaltGenerated = subject:match("packages/assets/src/assets.luau") ~= nil
 
     return luauMatched and not asphaltGenerated
