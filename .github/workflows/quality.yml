@@ -30,7 +30,7 @@ jobs:
           mise which rojo || echo "rojo not on path"
       
       - name: Install dependencies for scripts (quality checker)
-        run: /
+        run: |
           (
             cd scripts
             pesde install --locked
