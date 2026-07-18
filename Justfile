@@ -2,7 +2,7 @@ set windows-shell := ["pwsh", "-NoProfile", "-NoLogo", "-c"]
 set dotenv-load := true
 
 mprocs-args := '--names "rojo-sourcemap,darklua-process,rojo-serve" ' + \
-    '"rojo sourcemap default.project.json -o sourcemap.json --watch" ' + \
+    '"rojo sourcemap default.project.json -o sourcemap.json --include-non-scripts --watch" ' + \
     '"darklua process src dist --watch" ' + \
     '"rojo serve build.project.json"'
 
@@ -123,10 +123,20 @@ clean:
 [unix]
 [group('dev')]
 dev place:
-    set -eu && cd places/{{place}} && mprocs {{mprocs-args}}
+    set -eu &&
+    ( \
+        cd places/{{place}} \
+        rojo sourcemap default.project.json -o sourcemap.json \
+        darklua process src dist \
+        mprocs {{mprocs-args}} \
+    )
 
 # run rojo + darklua watchers for the given place
 [windows]
 [group('dev')]
 dev place:
-    $ErrorActionPreference = "Stop"; Set-Location places/{{place}} && mprocs {{mprocs-args}}
+    $ErrorActionPreference = "Stop"; \
+    Set-Location places/{{place}}; \
+    rojo sourcemap default.project.json -o sourcemap.json --include-non-scripts; \
+    darklua process src dist; \
+    mprocs {{mprocs-args}}
