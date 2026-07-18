@@ -4,5 +4,9 @@ version = "0.0.1"
 [target]
 environment = "roblox"
 
+[indices]
+default = "https://github.com/pesde-pkg/index"
+
 [dependencies]
 assets = { workspace = "word30210_rpe/assets", version = "^" }
+vide = { name = "centau/vide", version = "^0.4.0" }
