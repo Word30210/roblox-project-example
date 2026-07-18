@@ -31,6 +31,10 @@ const function onIncreasingScore(player: Player)
     end
 end
 
+for _, player in Players:GetPlayers() do
+    task.spawn(onPlayerAdded, player)
+end
+
 Players.PlayerAdded:Connect(onPlayerAdded)
 Players.PlayerRemoving:Connect(onPlayerRemoving)
 
