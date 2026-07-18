@@ -16,6 +16,9 @@
         "Workspace": { "$path": { "optional": "dist/workspace" } },
         "Players": {
             "$properties": { "CharacterAutoLoads": false }
+        },
+        "TextChatService": {
+            "TextChatCommands": { "$path": "rojo-assets/shared/commands" }
         }
     }
 }
