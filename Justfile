@@ -104,6 +104,7 @@ clean:
 [group('dist')]
 clean:
     $ErrorActionPreference = "Stop"; \
+    $PSNativeCommandUseErrorActionPreference = $true; \
     $ConfirmPreference = "None"; \
     Get-ChildItem -Path packages -Directory | ForEach-Object { \
         Push-Location $_.FullName; \
@@ -123,12 +124,12 @@ clean:
 [unix]
 [group('dev')]
 dev place:
-    set -eu &&
+    set -eu && \
     ( \
-        cd places/{{place}} \
-        rojo sourcemap default.project.json -o sourcemap.json \
-        darklua process src dist \
-        mprocs {{mprocs-args}} \
+        cd places/{{place}} && \
+        rojo sourcemap default.project.json -o sourcemap.json --include-non-scripts && \
+        darklua process src dist && \
+        mprocs {{mprocs-args}}
     )
 
 # run rojo + darklua watchers for the given place
@@ -136,6 +137,7 @@ dev place:
 [group('dev')]
 dev place:
     $ErrorActionPreference = "Stop"; \
+    $PSNativeCommandUseErrorActionPreference = $true; \
     Set-Location places/{{place}}; \
     rojo sourcemap default.project.json -o sourcemap.json --include-non-scripts; \
     darklua process src dist; \
