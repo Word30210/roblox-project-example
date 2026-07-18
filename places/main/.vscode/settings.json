@@ -5,9 +5,13 @@
     "luau-lsp.sourcemap.enabled": true,
     "luau-lsp.sourcemap.sourcemapFile": "sourcemap.json",
     "[lua]": {
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "JohnnyMorganz.stylua"
     },
     "[luau]": {
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "JohnnyMorganz.stylua"
     }
 }
