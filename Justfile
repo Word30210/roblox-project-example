@@ -51,7 +51,7 @@ refresh:
         ( \
             cd $place && \
             pesde install && \
-            rojo sourcemap default.project.json -o sourcemap.json && \
+            rojo sourcemap default.project.json -o sourcemap.json --include-non-scripts && \
             darklua process src dist \
         ); \
     done; \
@@ -72,7 +72,7 @@ refresh:
     Get-ChildItem -Path places -Directory | ForEach-Object { \
         Push-Location $_.FullName; \
         pesde install; \
-        rojo sourcemap default.project.json -o sourcemap.json; \
+        rojo sourcemap default.project.json -o sourcemap.json --include-non-scripts; \
         darklua process src dist; \
         Pop-Location; \
     }; \
