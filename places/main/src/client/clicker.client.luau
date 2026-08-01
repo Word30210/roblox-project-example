@@ -1,5 +1,5 @@
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+const Players = game:GetService("Players")
+const ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 const assets = require("@pkg/assets")
 
@@ -9,16 +9,23 @@ const source = vide.source
 const spring = vide.spring
 const root = vide.root
 
+const Clicker = require("@game/ReplicatedStorage/shared/clicker")
+
 const Remotes = ReplicatedStorage:WaitForChild("remotes")
 const increaseScore = Remotes:WaitForChild("increaseScore")
+const syncScore = Remotes:WaitForChild("syncScore")
 
 const localPlayer = Players.LocalPlayer
 const playerGui = localPlayer.PlayerGui
 
 const function app()
-    const score = source(0)
+    const clicker = source(Clicker.new())
     const isHovered = source(false)
     const isHeldDown = source(false)
+
+    syncScore.OnClientEvent:Connect(function(serverScore: number)
+        clicker(Clicker.applyAuthoritative(clicker(), serverScore))
+    end)
 
     create "ScreenGui" {
         Parent = playerGui,
@@ -42,7 +49,7 @@ const function app()
 
                 MouseButton1Down = function()
                     isHeldDown(true)
-                    score(score() + 1)
+                    clicker(Clicker.click(clicker()))
                     increaseScore:FireServer()
                 end,
 
@@ -82,7 +89,7 @@ const function app()
                 BackgroundTransparency = 1,
 
                 Text = function()
-                    return `Score: {score()}`
+                    return `Score: {clicker().score}`
                 end,
                 TextColor3 = Color3.new(1, 1, 1),
                 FontFace = Font.new("rbxassetid://12187365364"),
