@@ -1,0 +1,9 @@
+{
+    "languageMode": "strict", 
+    "aliases": {
+        "std": "~/.lute/typedefs/1.0.0/std", 
+        "lint": "~/.lute/typedefs/1.0.0/lint", 
+        "src": "../src", 
+        "lute": "~/.lute/typedefs/1.0.0/lute"
+    }
+}

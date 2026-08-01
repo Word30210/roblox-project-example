@@ -1,0 +1,30 @@
+const test = require("@std/test")
+const Clicker = require("@src/shared/clicker")
+
+test.suite("ClickerScore", function(suite)
+    suite:case("startsAtZero", function(asserts)
+        asserts.eq(0, Clicker.new().score)
+    end)
+
+    suite:case("clickAddsClickValue", function(asserts)
+        const clicker = Clicker.new()
+        asserts.eq(1, Clicker.click(clicker).score)
+    end)
+
+    suite:case("clickDoesNotMutate", function(asserts)
+        const clicker = Clicker.new()
+        Clicker.click(clicker)
+        asserts.eq(0, clicker.score)
+    end)
+
+    suite:case("rejectsNonPositiveClickValue", function(asserts)
+        asserts.throws(function()
+            Clicker.click({ score = 0, clickValue = 0 })
+        end)
+    end)
+
+    suite:case("rejectionForcesServerValue", function(asserts)
+        const clicker = Clicker.new({ score = 103, clickValue = 1 })
+        asserts.eq(100, Clicker.applyAuthoritative(clicker, 100).score)
+    end)
+end)
