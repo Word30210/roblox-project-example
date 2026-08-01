@@ -4,6 +4,7 @@
         "$className": "DataModel",
         "ReplicatedStorage": {
             "roblox_packages": { "$path": { "optional": "roblox_packages" } },
+            "shared": { "$path": { "optional": "src/shared" } },
             "remotes": { "$path": "rojo-assets/shared/remotes" }
         },
         "ServerScriptService": { "$path": { "optional": "dist/server" } },
