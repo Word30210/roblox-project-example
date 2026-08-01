@@ -33,6 +33,7 @@ const function onPlayerRemoving(player: Player)
     const scoreValue = scoreValues[player]
     scoreValue:Destroy()
     scoreValues[player] = nil
+    clickers[player] = nil
     buckets[player] = nil
 end
 
