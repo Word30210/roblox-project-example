@@ -13,7 +13,8 @@ const collector = Collector.new()
 
 const luauFiles = utils.getPaths(function(full)
     const subject = path.format(full):gsub("\\", "/")
-    const luauMatched = subject:match("/src/.+%.luau?$") ~= nil and subject:match("_packages") == nil
+    const inSource = subject:match("/src/.+%.luau?$") ~= nil or subject:match("/test/.+%.luau?$") ~= nil
+    const luauMatched = inSource and subject:match("_packages") == nil
     const asphaltGenerated = subject:match("packages/assets/src/assets.luau") ~= nil
 
     return luauMatched and not asphaltGenerated
@@ -117,6 +118,33 @@ const function checkSelene()
         else
             report.status = "err"
             report.detail = "couldn't find 'selene.toml'."
+        end
+
+        collector:record(report, header)
+    end
+end
+
+const function runTests()
+    const tool = "lute"
+    const header = Collector.header("[TEST SUITE]")
+    collector:record(header)
+
+    for _, place in fs.listDirectory("places") do
+        const full = path.join("places", place.name)
+        const report = Collector.content("unknown", tool, full, nil, nil, header)
+
+        const runOptions: process.ProcessRunOptions = { cwd = utils.toRelative(full) }
+        const ok, res = pcall(process.run, { "lute", "test" }, runOptions)
+
+        if not ok then
+            report.status = "err"
+            report.detail = (res :: any) :: string
+        elseif res.exitcode >= 1 then
+            report.status = "fail"
+            report.detail = if res.stdout ~= "" then res.stdout else res.stderr
+        else
+            report.status = "pass"
+            report.detail = res.stdout
         end
 
         collector:record(report, header)
@@ -300,6 +328,9 @@ if not optionHashmap.noStylua then
 end
 if not optionHashmap.noSelene then
     checkSelene()
+end
+if not optionHashmap.noTest then
+    runTests()
 end
 if optionHashmap.doBuild then
     buildWithRojo()

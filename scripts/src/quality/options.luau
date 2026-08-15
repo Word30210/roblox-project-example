@@ -57,6 +57,7 @@ module.options = table.freeze({
         "Let StyLua rewrite files in place to resolve formatting differences."
     ),
     noSelene = register({ "no selene", "no lint" }, "Skip running selene; no static analysis is performed."),
+    noTest = register({ "no test", "no tests" }, "Skip running the test suites with lute test."),
     doBuild = register({ "build", "do build", "rojo", "do rojo" }, "Run the Rojo build step to produce place files."),
     noBuildOutput = register(
         { "no build output", "no rojo output" },
