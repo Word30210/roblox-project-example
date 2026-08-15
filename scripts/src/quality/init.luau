@@ -267,7 +267,8 @@ const function buildWithRojo()
         -- sourcemap
         stepOptions.header = placeSourcemapHeader
         stepOptions.tool = "rojo"
-        stepOptions.runArgs = { "rojo", "sourcemap", "default.project.json", "-o", "sourcemap.json" }
+        stepOptions.runArgs =
+            { "rojo", "sourcemap", "default.project.json", "-o", "sourcemap.json", "--include-non-scripts" }
         stepOptions = runStep(stepOptions)
 
         -- darklua
