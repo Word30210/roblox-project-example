@@ -10,6 +10,11 @@ concurrency:
   group: cd-dev
   cancel-in-progress: true
 
+# Least privilege: deploy authenticates to Roblox with its own API keys, never
+# with GITHUB_TOKEN, so the repo token only needs read access to check out code.
+permissions:
+  contents: read
+
 jobs:
   # Reuse the exact CI checks (format + lint + test + build verification) as a
   # gate. If anything fails, the deploy job below never runs.
@@ -22,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup mise
         uses: jdx/mise-action@v2

@@ -11,12 +11,20 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege: these jobs run repository-controlled scripts (lute/pesde/
+# darklua) and never write back to the repo, so read-only is enough. Applies to
+# callers too when this workflow is reused via workflow_call.
+permissions:
+  contents: read
+
 jobs:
   quality:
     name: Format & Lint & Build Verification
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup mise
         uses: jdx/mise-action@v2

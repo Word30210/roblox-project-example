@@ -9,6 +9,11 @@ concurrency:
   group: cd-prod
   cancel-in-progress: false
 
+# Least privilege: deploy authenticates to Roblox with its own API keys, never
+# with GITHUB_TOKEN, so the repo token only needs read access to check out code.
+permissions:
+  contents: read
+
 jobs:
   # Same quality gate as CI, run against the manually-selected ref before deploy.
   quality:
@@ -23,6 +28,8 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup mise
         uses: jdx/mise-action@v2
