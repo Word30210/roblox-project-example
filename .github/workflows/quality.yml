@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Allow CD workflows to reuse these checks as a gate before deploying.
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.ref }}

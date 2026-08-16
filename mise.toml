@@ -6,6 +6,7 @@
 "github:pesde-pkg/pesde" = "0.7.3+registry.0.2.3"
 "github:rojo-rbx/rojo" = "7.7.0"
 "github:seaofvoices/darklua" = "0.19.0"
+"github:Sleitnick/rbxcloud" = "0.17.0"
 just = "1.55.1"
 mprocs = "0.9.6"
 

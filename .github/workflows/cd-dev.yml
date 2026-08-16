@@ -1,0 +1,51 @@
+name: CD (dev → test place)
+
+# Every push to `dev` is gated by the quality checks and then automatically
+# deployed to the test place (same universe, different place id).
+on:
+  push:
+    branches: [dev]
+
+concurrency:
+  group: cd-dev
+  cancel-in-progress: true
+
+jobs:
+  # Reuse the exact CI checks (format + lint + test + build verification) as a
+  # gate. If anything fails, the deploy job below never runs.
+  quality:
+    uses: ./.github/workflows/quality.yml
+
+  deploy:
+    name: Build & publish to test place
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Install dependencies for scripts (quality checker)
+        run: |
+          (
+            cd scripts
+            pesde install --locked
+          )
+
+      # Reuse the quality tool purely as a builder: skip the checks (already run
+      # in the gate), upload assets to Roblox cloud, and produce places/main/main.rbxl.
+      - name: Build place (sync assets + rojo build)
+        env:
+          ASPHALT_API_KEY: ${{ secrets.ASPHALT_API_KEY }}
+        run: lute run scripts/src/quality --no-stylua --no-selene --no-test --build --sync-assets --verbose
+
+      - name: Publish to test place
+        env:
+          RBXCLOUD_API_KEY: ${{ secrets.RBXCLOUD_API_KEY }}
+        run: |
+          rbxcloud experience publish \
+            --filename places/main/main.rbxl \
+            --version-type published \
+            --place-id ${{ vars.TEST_PLACE_ID }} \
+            --universe-id ${{ vars.UNIVERSE_ID }}
